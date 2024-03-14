@@ -1,0 +1,29 @@
+#!/usr/bin/python3
+import time
+import sys
+from os import getenv
+from datetime import datetime
+import logging
+logging.disable(logging.DEBUG)
+logging.basicConfig(encoding='utf-8', level=logging.DEBUG)
+
+healthy_timeout=int(getenv('J-HEALTHY-TIMEOUT', default = "900"))
+
+def log(result,resta):
+    msg=f'{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}; Healthy {result}, time:{round(resta)}, timeout:{healthy_timeout}'
+    if result=='OK':
+        logging.info(msg)
+    else:
+        logging.error(msg)
+
+with open('/home/timex', 'r') as archivo:
+    contenido = float(archivo.read())
+
+resta=time.time()-contenido
+if resta > healthy_timeout:
+    log('FAILED',resta)
+    sys.exit(1)
+else:
+    log('OK',resta)
+    sys.exit(0)
+
